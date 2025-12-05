@@ -1,23 +1,61 @@
 package com.example.midmid.Controller;
 
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpHeaders;
+import com.example.midmid.Service.MinioService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/files")
+@CrossOrigin(origins = "*")
 public class FileController {
 
     private final MinioService minioService;
+    
+    @Autowired
+    public FileController(MinioService minioService) {
+        this.minioService = minioService;
+    }
+    
+    private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("png", "txt", "json");
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("Security работает! API доступен без аутентификации.");
+    }
 
     @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile file) throws Exception {
-        minioService.upload(file);
-        return "файл жуктелды";
+    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
+        try {
+
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename == null || originalFilename.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный тип файла");
+            }
+
+            String extension = "";
+            int lastDotIndex = originalFilename.lastIndexOf('.');
+            if (lastDotIndex > 0 && lastDotIndex < originalFilename.length() - 1) {
+                extension = originalFilename.substring(lastDotIndex + 1).toLowerCase();
+            }
+
+            if (!ALLOWED_EXTENSIONS.contains(extension)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный тип файла");
+            }
+            
+            minioService.upload(file);
+            return ResponseEntity.ok("файл жуктелды");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Ошибка при загрузке файла: " + e.getMessage());
+        }
     }
 
 }
