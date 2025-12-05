@@ -26,7 +26,7 @@ public class FileController {
 
     @GetMapping("/test")
     public ResponseEntity<String> test() {
-        return ResponseEntity.ok("Security работает! API доступен без аутентификации.");
+        return ResponseEntity.ok("Security жасап тур");
     }
 
     @PostMapping("/upload")
@@ -36,7 +36,7 @@ public class FileController {
             String originalFilename = file.getOriginalFilename();
             if (originalFilename == null || originalFilename.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Неверный тип файла");
+                    .body("кате жол");
             }
 
             String extension = "";
@@ -47,14 +47,14 @@ public class FileController {
 
             if (!ALLOWED_EXTENSIONS.contains(extension)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Неверный тип файла");
+                    .body("кате файл типы");
             }
             
             minioService.upload(file);
             return ResponseEntity.ok("файл жуктелды");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Ошибка при загрузке файла: " + e.getMessage());
+                .body("файл жуктегендеуде кате: " + e.getMessage());
         }
     }
 
