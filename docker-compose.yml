@@ -2,7 +2,7 @@ version: "3.8"
 services:
   postgres:
     image: postgres:15
-    container_name: postgresRR
+    container_name: postgresS
     environment:
       POSTGRES_USER: datalake_user
       POSTGRES_PASSWORD: datalake_password
@@ -12,7 +12,7 @@ services:
 
   minio:
     image: minio/minio
-    container_name: minioRRR
+    container_name: minioS
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
